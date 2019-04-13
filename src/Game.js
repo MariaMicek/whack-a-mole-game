@@ -10,6 +10,7 @@ class Game extends Component {
 			[7, 8, 9]
 		],
 		isGameStarted: false,
+		isGameFinished: false,
 		randomWhole: null,
 		score: 0
 	}
@@ -27,14 +28,18 @@ class Game extends Component {
 
 	startGame = () => {
 		if (this.state.isGameStarted) return
-		this.setState({ isGameStarted: true })
+		this.setState({ 
+			isGameStarted: true, 
+			isGameFinished: false,
+			score: 0, 
+		})
 		this.showMole()
 	}
 
 	showMole = () => {
 		const showMole = setInterval(
 			this.randomWhole,
-			500
+			1500
 		)
 		this.endGame(showMole)
 	}
@@ -43,17 +48,30 @@ class Game extends Component {
 		setTimeout(
 			() => {
 				clearInterval(showMole)
-				this.setState({ isGameStarted: false, randomWhole: null })
+				this.setState({ 
+					isGameStarted: false, 
+					randomWhole: null, 
+					isGameFinished: true, 
+				})
 			},
-			5000
+			10000
 		)
 	}
 
+	countScores = (userWhole) => {
+		if (this.state.randomWhole === userWhole) {
+			this.setState({score: this.state.score + 1})
+		}
+		console.log(this.state.randomWhole)
+		console.log(userWhole)
+		console.log(this.state.score)
+	}
+
 	render() {
-		console.log(this.state.isGameStarted)
 		return (
 			<div>
-				<h2>WHACK A MOLE</h2>
+				<h1>WHACK A MOLE</h1>
+				<h2>your score: {this.state.score}</h2>
 				<div
 					className={'board'}
 				>
@@ -66,17 +84,21 @@ class Game extends Component {
 								>
 									{
 										row.map(
-											(whole, wholeIndex) => (
-												<Whole
-													key={wholeIndex}
-													className={
-														this.state.randomWhole === array[rowIndex][wholeIndex] ?
-															'whole active'
-															:
-															'whole'
-													}
-												/>
-											)
+											(el, wholeIndex) => {
+												const whole = array[rowIndex][wholeIndex]
+												return (
+													<Whole
+														countScores={() => this.countScores(whole)}
+														key={wholeIndex}
+														className={
+															this.state.randomWhole === whole ?
+																'whole active'
+																:
+																'whole'
+														}
+													/>
+												)
+											}
 										)
 									}
 								</div>
