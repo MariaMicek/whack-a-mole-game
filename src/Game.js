@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Whole from './Whole'
+import GameBoard from './GameBoard'
 import Button from '@material-ui/core/Button'
 
 class Game extends Component {
@@ -12,7 +12,8 @@ class Game extends Component {
 		isGameStarted: false,
 		isGameFinished: false,
 		randomWhole: null,
-		score: 0
+		score: 0,
+		isLevel2: false,
 	}
 
 	randomWhole = () => {
@@ -28,30 +29,49 @@ class Game extends Component {
 
 	startGame = () => {
 		if (this.state.isGameStarted) return
-		this.setState({ 
-			isGameStarted: true, 
+		this.setState({
+			isGameStarted: true,
 			isGameFinished: false,
-			score: 0, 
+			score: 0,
 		})
-		this.showMole()
+		this.startLevel1()
+		this.endGame()
 	}
 
-	showMole = () => {
+	startLevel1 = () => {
+		const showMole = setInterval(
+			() => {
+				this.checkLevel()
+				this.randomWhole()
+			},
+			1000
+		)
+		this.setState({ interval: showMole })
+	}
+
+	checkLevel = () => {
+		if (this.state.score >= 3) {
+			clearInterval(this.state.interval)
+			this.startLevel2()
+		}
+	}
+
+	startLevel2 = () => {
 		const showMole = setInterval(
 			this.randomWhole,
-			1500
+			500
 		)
-		this.endGame(showMole)
+		this.setState({ interval: showMole })
 	}
 
-	endGame = (showMole) => {
+	endGame = () => {
 		setTimeout(
 			() => {
-				clearInterval(showMole)
-				this.setState({ 
-					isGameStarted: false, 
-					randomWhole: null, 
-					isGameFinished: true, 
+				clearInterval(this.state.interval)
+				this.setState({
+					isGameFinished: true,
+					isGameStarted: false,
+					randomWhole: null,
 				})
 			},
 			10000
@@ -60,58 +80,28 @@ class Game extends Component {
 
 	countScores = (userWhole) => {
 		if (this.state.randomWhole === userWhole) {
-			this.setState({score: this.state.score + 1})
+			this.setState({ score: this.state.score + 1 })
 		}
-		console.log(this.state.randomWhole)
-		console.log(userWhole)
-		console.log(this.state.score)
 	}
 
 	render() {
+		console.log(this.state)
 		return (
 			<div>
 				<h1>WHACK A MOLE</h1>
 				<h2>your score: {this.state.score}</h2>
-				<div
+				<GameBoard
+					wholes={this.state.wholes}
+					countScores={this.countScores}
 					className={'board'}
-				>
-					{
-						this.state.wholes.map(
-							(row, rowIndex, array) => (
-								<div
-									key={'row' + rowIndex}
-									className={'board-row'}
-								>
-									{
-										row.map(
-											(el, wholeIndex) => {
-												const whole = array[rowIndex][wholeIndex]
-												return (
-													<Whole
-														countScores={() => this.countScores(whole)}
-														key={wholeIndex}
-														className={
-															this.state.randomWhole === whole ?
-																'whole active'
-																:
-																'whole'
-														}
-													/>
-												)
-											}
-										)
-									}
-								</div>
-							)
-						)
-					}
-				</div>
+					randomWhole={this.state.randomWhole}
+				/>
 				<Button
 					variant={'contained'}
 					onClick={this.startGame}
 				>
 					START
-        </Button>
+        		</Button>
 			</div>
 		)
 	}
