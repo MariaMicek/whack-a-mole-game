@@ -1,6 +1,7 @@
 import React from 'react'
 import Whole from './Whole'
 
+
 const GameBoard = (props) => {
     return (
         <div

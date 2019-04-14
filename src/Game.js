@@ -30,7 +30,6 @@ class Game extends Component {
 	}
 
 	startGame = () => {
-		if (this.state.isGameStarted) return
 		this.setState({
 			isGameStarted: true,
 			isGameFinished: false,
@@ -42,13 +41,12 @@ class Game extends Component {
 
 	startLevel1 = () => {
 		this.randomWhole()
-
 		const showMole = setInterval(
 			() => {
 				this.checkLevel()
 				this.randomWhole()
 			},
-			3000
+			1700
 		)
 		this.setState({ interval: showMole })
 	}
@@ -58,14 +56,13 @@ class Game extends Component {
 			clearInterval(this.state.interval)
 			this.startLevel2()
 		}
-		console.log(this.state.isSecondLevelStarted)
 	}
 
 	startLevel2 = () => {
 		this.randomWhole()
 		const showMole = setInterval(
 			this.randomWhole,
-			500
+			1000
 		)
 		this.setState({ interval: showMole })
 	}
@@ -106,27 +103,33 @@ class Game extends Component {
 					randomWhole: null,
 				})
 			},
-			20000
+			30000
 		)
 	}
 
 	render() {
 		return (
-			<div>
-				<h1>WHACK A MOLE</h1>
-				<h2>your score: {this.state.score}</h2>
+			<div className={'container'}>
+				<h1 className={'h1'}>WHACK A MOLE</h1>
+				<h2 className={'h2'}>{this.state.score}</h2>
 				<GameBoard
 					wholes={this.state.wholes}
 					onUserClick={this.onUserClick}
 					className={'board'}
 					randomWhole={this.state.randomWhole}
 				/>
-				<Button
-					variant={'contained'}
-					onClick={this.startGame}
-				>
-					START
-        		</Button>
+				{
+					!this.state.isGameStarted ?
+						<Button
+							variant={'contained'}
+							onClick={this.startGame}
+						>
+							START
+        				</Button>
+						:
+						null
+				}
+
 			</div>
 		)
 	}
