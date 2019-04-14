@@ -53,7 +53,8 @@
 }
 
 .modal-div {
-    padding: 10px 15px;
+    padding: 20px;
+    border-radius: 7px;
     background: #fff;
     display: flex;
     flex-direction: column;
@@ -62,6 +63,13 @@
 }
 
 .modal-h2{
-    padding: 10px;
+    padding: 20px 0 10px;
 }
 
+.bold-result {
+    font-weight: bold;
+}
+
+.p-modal, .button {
+    font-size: 20px;
+}

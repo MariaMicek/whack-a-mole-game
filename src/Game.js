@@ -21,6 +21,7 @@ class Game extends Component {
 		result: null,
 		name: '',
 		allResults: [],
+		isResultSaved: false,
 		score: 0,
 	}
 
@@ -118,22 +119,21 @@ class Game extends Component {
 					isModalOpen: true,
 				})
 			},
-			1000
+			120000
 		)
 	}
 
 	onChangeName = (event) => {
-		this.setState({name: event.target.value})
+		this.setState({ name: event.target.value })
 	}
 
 	saveResult = () => {
+		if (this.state.isResultSaved) return
 		database.ref('/results/').push({
 			name: this.state.name,
 			result: this.state.result
 		})
-		.then(
-			this.setState({name: ''})
-		)
+		this.setState({ isResultSaved: true })
 	}
 
 	toggleModal = () => {

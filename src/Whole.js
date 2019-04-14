@@ -6,7 +6,6 @@ const Whole = (props) => {
             onClick={props.onUserClick}
             className={props.className}
         >
-
         </div>
     )
 }
