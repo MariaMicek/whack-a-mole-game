@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import GameBoard from './GameBoard'
+import ModalWindow from './Modal'
 import Button from '@material-ui/core/Button'
+import { database } from './firebaseConfig'
 
 class Game extends Component {
 	state = {
@@ -12,10 +14,21 @@ class Game extends Component {
 		],
 		isGameStarted: false,
 		isGameFinished: false,
+		isModalOpen: false,
 		isSecondLevelStarted: false,
 		interval: null,
 		randomWhole: null,
+		result: null,
+		name: '',
+		allResults: [],
 		score: 0,
+	}
+
+	componentDidMount = () => {
+		database.ref('/results/').on(
+			'value',
+			snapshot => this.setState({ allResults: Object.entries(snapshot.val()) })
+		)
 	}
 
 	randomWhole = () => {
@@ -101,10 +114,30 @@ class Game extends Component {
 					isGameStarted: false,
 					isSecondLevelStarted: false,
 					randomWhole: null,
+					result: this.state.score,
+					isModalOpen: true,
 				})
 			},
-			30000
+			1000
 		)
+	}
+
+	onChangeName = (event) => {
+		this.setState({name: event.target.value})
+	}
+
+	saveResult = () => {
+		database.ref('/results/').push({
+			name: this.state.name,
+			result: this.state.result
+		})
+		.then(
+			this.setState({name: ''})
+		)
+	}
+
+	toggleModal = () => {
+		this.setState({ isModalOpen: !this.state.isModalOpen })
 	}
 
 	render() {
@@ -129,6 +162,15 @@ class Game extends Component {
 						:
 						null
 				}
+				<ModalWindow
+					result={this.state.result}
+					name={this.state.name}
+					onChangeName={this.onChangeName}
+					allResults={this.state.allResults}
+					saveResult={this.saveResult}
+					isModalOpen={this.state.isModalOpen}
+					toggleModal={this.toggleModal}
+				/>
 
 			</div>
 		)
