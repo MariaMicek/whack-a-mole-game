@@ -19,7 +19,7 @@ const GameBoard = (props) => {
                                         const whole = array[rowIndex][wholeIndex]
                                         return (
                                             <Whole
-                                                countScores={() => props.countScores(whole)}
+                                                onUserClick={() => props.onUserClick(whole)}
                                                 key={wholeIndex}
                                                 className={
                                                     props.randomWhole === whole ?
