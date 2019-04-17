@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Whole = (props) => {
+const Field = (props) => {
     return (
         <div
             onClick={props.onUserClick}
@@ -10,4 +10,4 @@ const Whole = (props) => {
     )
 }
 
-export default Whole
+export default Field

@@ -1,5 +1,6 @@
 import React from 'react'
-import Whole from './Whole'
+import Field from './Field'
+import style from './style.module.css'
 
 const GameBoard = (props) => {
     return (
@@ -7,25 +8,24 @@ const GameBoard = (props) => {
             className={props.className}
         >
             {
-                props.wholes.map(
-                    (row, rowIndex, array) => (
+                props.fields.map(
+                    (row, rowIndex) => (
                         <div
                             key={'row' + rowIndex}
-                            className={'board-row'}
+                            className={style['board-row']}
                         >
                             {
                                 row.map(
-                                    (el, wholeIndex) => {
-                                        const whole = array[rowIndex][wholeIndex]
+                                    (field, fieldIndex) => {
                                         return (
-                                            <Whole
-                                                onUserClick={() => props.onUserClick(whole)}
-                                                key={wholeIndex}
+                                            <Field
+                                                onUserClick={() => props.onUserClick(field)}
+                                                key={fieldIndex}
                                                 className={
-                                                    props.randomWhole === whole ?
-                                                        'whole active'
+                                                    props.randomField === field ?
+                                                        style['field'] + ' ' + style['active']
                                                         :
-                                                        'whole'
+                                                        style['field']
                                                 }
                                             />
                                         )

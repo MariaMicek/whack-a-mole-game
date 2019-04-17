@@ -3,10 +3,11 @@ import GameBoard from './GameBoard'
 import ModalWindow from './Modal'
 import Button from '@material-ui/core/Button'
 import { database } from './firebaseConfig'
+import style from './style.module.css'
 
 class Game extends Component {
 	state = {
-		wholes: [
+		fields: [
 			[1, 2, 3],
 			[4, 5, 6],
 			[7, 8, 9],
@@ -17,12 +18,13 @@ class Game extends Component {
 		isModalOpen: false,
 		isSecondLevelStarted: false,
 		interval: null,
-		randomWhole: null,
+		randomField: null,
 		result: null,
 		name: '',
 		allResults: [],
 		isResultSaved: false,
 		score: 0,
+		time: 120,
 	}
 
 	componentDidMount = () => {
@@ -32,33 +34,36 @@ class Game extends Component {
 		)
 	}
 
-	randomWhole = () => {
-		const randomRowIndex = Math.floor(Math.random() * this.state.wholes.length)
-		const randomRowArray = this.state.wholes[randomRowIndex]
-		const randomWholeIndex = Math.floor(Math.random() * randomRowArray.length)
-		const randomWhole = this.state.wholes[randomRowIndex][randomWholeIndex]
-		if (randomWhole === this.state.randomWhole) {
-			return this.randomWhole()
+	randomField = () => {
+		const randomRowIndex = Math.floor(Math.random() * this.state.fields.length)
+		const randomRowArray = this.state.fields[randomRowIndex]
+		const randomFieldIndex = Math.floor(Math.random() * randomRowArray.length)
+		const randomField = this.state.fields[randomRowIndex][randomFieldIndex]
+		if (randomField === this.state.randomField) {
+			return this.randomField()
 		}
-		this.setState({ randomWhole: randomWhole })
+		this.setState({ randomField: randomField })
 	}
 
 	startGame = () => {
 		this.setState({
 			isGameStarted: true,
 			isGameFinished: false,
+			isResultSaved: false,
+			name: '',
 			score: 0,
+			time: 120
 		})
 		this.startLevel1()
 		this.endGame()
 	}
 
 	startLevel1 = () => {
-		this.randomWhole()
+		this.randomField()
 		const showMole = setInterval(
 			() => {
 				this.checkLevel()
-				this.randomWhole()
+				this.randomField()
 			},
 			1700
 		)
@@ -73,9 +78,9 @@ class Game extends Component {
 	}
 
 	startLevel2 = () => {
-		this.randomWhole()
+		this.randomField()
 		const showMole = setInterval(
-			this.randomWhole,
+			this.randomField,
 			1000
 		)
 		this.setState({ interval: showMole })
@@ -100,21 +105,27 @@ class Game extends Component {
 	}
 
 	onUserClick = (userWhole) => {
-		if (this.state.randomWhole === userWhole) {
+		if (this.state.randomField === userWhole) {
 			this.countScores()
 			this.nextMove()
 		}
 	}
 
 	endGame = () => {
+		const timerInterval = setInterval(
+			() => this.setState({ time: this.state.time - 1 }),
+			1000
+		)
+
 		setTimeout(
 			() => {
 				clearInterval(this.state.interval)
+				clearInterval(timerInterval)
 				this.setState({
 					isGameFinished: true,
 					isGameStarted: false,
 					isSecondLevelStarted: false,
-					randomWhole: null,
+					randomField: null,
 					result: this.state.score,
 					isModalOpen: true,
 				})
@@ -129,6 +140,7 @@ class Game extends Component {
 
 	saveResult = () => {
 		if (this.state.isResultSaved) return
+		if (this.state.name === '') return
 		database.ref('/results/').push({
 			name: this.state.name,
 			result: this.state.result
@@ -142,14 +154,21 @@ class Game extends Component {
 
 	render() {
 		return (
-			<div className={'container'}>
-				<h1 className={'h1'}>WHACK A MOLE</h1>
-				<h2 className={'h2'}>{this.state.score}</h2>
+			<div className={style['container']}>
+				<h1 className={style['h1']}>WHACK A MOLE</h1>
+				<h2 className={style['h2']}>
+					<div>
+						TIME: {this.state.time}
+					</div>
+					<div>
+						SCORE: {this.state.score}
+					</div>
+				</h2>
 				<GameBoard
-					wholes={this.state.wholes}
+					fields={this.state.fields}
 					onUserClick={this.onUserClick}
-					className={'board'}
-					randomWhole={this.state.randomWhole}
+					className={style['board']}
+					randomField={this.state.randomField}
 				/>
 				{
 					!this.state.isGameStarted ?
