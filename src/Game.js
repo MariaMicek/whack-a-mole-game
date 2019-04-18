@@ -16,7 +16,6 @@ class Game extends Component {
 		isGameStarted: false,
 		isGameFinished: false,
 		isModalOpen: false,
-		isSecondLevelStarted: false,
 		interval: null,
 		randomField: null,
 		result: null,
@@ -25,6 +24,7 @@ class Game extends Component {
 		isResultSaved: false,
 		score: 0,
 		time: 120,
+		timeTick: 1500,
 	}
 
 	componentDidMount = () => {
@@ -52,62 +52,43 @@ class Game extends Component {
 			isResultSaved: false,
 			name: '',
 			score: 0,
-			time: 120
+			time: 120,
 		})
-		this.startLevel1()
+		this.nextMove(this.state.timeTick)
 		this.endGame()
 	}
 
-	startLevel1 = () => {
+	nextMove = (timeTick) => {
 		this.randomField()
 		const showMole = setInterval(
-			() => {
-				this.checkLevel()
-				this.randomField()
-			},
-			1700
+			() => this.randomField(),
+			timeTick
 		)
 		this.setState({ interval: showMole })
-	}
-
-	checkLevel = () => {
-		if (this.state.isSecondLevelStarted) {
-			clearInterval(this.state.interval)
-			this.startLevel2()
-		}
-	}
-
-	startLevel2 = () => {
-		this.randomField()
-		const showMole = setInterval(
-			this.randomField,
-			1000
-		)
-		this.setState({ interval: showMole })
-	}
-
-	nextMove = () => {
-		if (this.state.isSecondLevelStarted) {
-			clearInterval(this.state.interval)
-			this.startLevel2()
-		} else {
-			clearInterval(this.state.interval)
-			this.startLevel1()
-		}
 	}
 
 	countScores = () => {
 		this.setState({ score: this.state.score + 1 })
-		if (this.state.score + 1 >= 9) {
-			this.setState({ isSecondLevelStarted: true })
-			clearInterval(this.state.interval)
+	}
+
+	increaseLevel = () => {
+		if (this.state.score === 8) {
+			this.setState({ timeTick: 1200 })
+		}
+		if (this.state.score === 28) {
+			this.setState({ timeTick: 900 })
+		}
+		if (this.state.score === 58) {
+			this.setState({ timeTick: 600 })
 		}
 	}
 
 	onUserClick = (userWhole) => {
 		if (this.state.randomField === userWhole) {
 			this.countScores()
-			this.nextMove()
+			this.increaseLevel()
+			clearInterval(this.state.interval)
+			this.nextMove(this.state.timeTick)
 		}
 	}
 
@@ -127,8 +108,12 @@ class Game extends Component {
 					isSecondLevelStarted: false,
 					randomField: null,
 					result: this.state.score,
-					isModalOpen: true,
+					timeTick: 1500,
 				})
+				setTimeout(
+					() => this.setState({ isModalOpen: true }),
+					1200
+				)
 			},
 			120000
 		)
